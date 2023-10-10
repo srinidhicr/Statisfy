@@ -18,7 +18,15 @@ import javafx.scene.layout.BackgroundRepeat;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Background;
 import javafx.scene.text.Font;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.io.IOException;
 
 public class LoginPage {
@@ -31,9 +39,6 @@ public class LoginPage {
     }
 
     private void createUI() {
-        Screen primaryScreen = Screen.getPrimary();
-        double screenWidth = primaryScreen.getBounds().getWidth();
-        double screenHeight = primaryScreen.getBounds().getHeight();
         Image spotifyLogo = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/Spotify_logo.png");
         Image backgroundImage = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/login-bg.png"); // Replace with the correct path
 
@@ -90,13 +95,13 @@ public class LoginPage {
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-
+                /*
                 Dashboard dashboard = new Dashboard(primaryStage);
                 primaryStage.setTitle("Spotify - Dashboard");
                 primaryStage.setScene(dashboard.getScene());
                 primaryStage.show();
+                */
 
-                /*
                 try {
                     // Execute the Spotify authorization Python script
                     ProcessBuilder processBuilder = new ProcessBuilder("python3", "src/python-scripts/main.py");
@@ -116,12 +121,90 @@ public class LoginPage {
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
-            */
+                RecentlyPlayedTracks();
+
             }
 
         });
 
     }
+
+    private void RecentlyPlayedTracks() {
+        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/python-scripts/recently_played.json"; // Replace with the actual path to your JSON file
+
+        // Read JSON data from the file
+        String jsonData = readFile(jsonFilePath);
+
+        // Parse the JSON data as an array
+        JsonArray jsonArray = JsonParser.parseString(jsonData).getAsJsonArray();
+
+        // Database URL, username, and password
+        String dbUrl = "jdbc:mysql://localhost:3306/spotify_data"; // Update with your database name
+        String dbUsername = "root";
+        String dbPassword = "appleball9";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject trackObject = jsonArray.get(i).getAsJsonObject();
+                JsonObject track = trackObject.getAsJsonObject("track");
+
+                // Extract track information as needed
+                String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
+                String trackName = track.get("name").getAsString();
+                int duration = track.get("duration_ms").getAsInt();
+                String albumCover = track.getAsJsonObject("album")
+                        .getAsJsonArray("images")
+                        .get(0).getAsJsonObject()
+                        .get("url").getAsString();
+                String artistCover = track.getAsJsonArray("artists")
+                        .get(0).getAsJsonObject()
+                        .getAsJsonObject("external_urls")
+                        .get("spotify").getAsString();
+                String releaseData = track.getAsJsonObject("album")
+                        .get("release_date").getAsString();
+
+                // Insert data into the database
+                insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+    private String readFile(String filePath) {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                content.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content.toString();
+    }
+    private static void insertTrack(Connection connection, String artistName, String trackName, int duration,
+                                    String albumCover, String artistCover, String releaseData) throws SQLException {
+        String insertSQL = "INSERT INTO recently_played_tracks (artist_name, track_name, duration, album_cover, artist_cover, release_data) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+            preparedStatement.setString(1, artistName);
+            preparedStatement.setString(2, trackName);
+            preparedStatement.setInt(3, duration);
+            preparedStatement.setString(4, albumCover);
+            preparedStatement.setString(5, artistCover);
+            preparedStatement.setString(6, releaseData);
+
+            preparedStatement.executeUpdate();
+        }
+    }
+
 
     public Scene getScene() {
         return scene;

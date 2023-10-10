@@ -1,6 +1,7 @@
 package com.example.spotify;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
@@ -58,16 +59,22 @@ public class Dashboard {
         note.setFont(font);
         note.setTranslateY(-250);
 
+        // Create a VBox to hold the button grid and note
+        VBox content = new VBox();
+        content.setAlignment(Pos.CENTER);
+        content.setSpacing(20);
+
         // Create a GridPane for the buttons
         GridPane buttonGrid = new GridPane();
         buttonGrid.setHgap(20); // Horizontal gap between buttons
         buttonGrid.setVgap(20); // Vertical gap between buttons
-        buttonGrid.setTranslateY(-100); // Adjust the position as needed
+        buttonGrid.setAlignment(Pos.CENTER);
+        buttonGrid.setTranslateY(-200);
 
-        Button artists = createButton("Artists");
-        Button tracks = createButton("Tracks");
-        Button albums = createButton("Albums");
-        Button genres = createButton("Genres");
+        Button artists = createButton2("Artists");
+        Button tracks = createButton2("Tracks");
+        Button albums = createButton2("Albums");
+        Button genres = createButton2("Genres");
 
         // Add buttons to the GridPane at specific row and column positions
         buttonGrid.add(artists, 0, 0);
@@ -75,8 +82,12 @@ public class Dashboard {
         buttonGrid.add(albums, 0, 1);
         buttonGrid.add(genres, 1, 1);
 
+        content.getChildren().addAll(splogoImageView, note, buttonGrid);
+
         scene = new Scene(root, 1200, 1250);
-        root.getChildren().addAll(borderPane, splogoImageView, note, buttonGrid);
+
+        // Add content first, then borderPane
+        root.getChildren().addAll(content, borderPane);
         primaryStage.show();
     }
 
@@ -96,6 +107,24 @@ public class Dashboard {
         });
 
         button.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        button.setOnAction(e -> System.out.println(text + " clicked"));
+        return button;
+    }
+
+    private Button createButton2(String text) {
+        Button button = new Button(text);
+
+        button.setPrefWidth(200);
+        button.setPrefHeight(40);
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:  RGB(1,76,66); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color: RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setStyle("-fx-background-color:  RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
         button.setOnAction(e -> System.out.println(text + " clicked"));
         return button;
     }
