@@ -17,7 +17,7 @@ public class SpotifyApplication extends Application {
         Scene scene = new Scene(root, 1200, 1250);
 
         // Set the background color of the scene to black
-        scene.getRoot().setStyle("-fx-background-color: RGB(20, 20, 20);");
+        scene.getRoot().setStyle("-fx-background-color: black;");
         LoginPage loginPage = new LoginPage(primaryStage);
         primaryStage.setTitle("Spotify - Login");
         primaryStage.setScene(loginPage.getScene());

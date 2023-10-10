@@ -2,20 +2,27 @@ package com.example.spotify;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.Background;
+import javafx.scene.text.Font;
+
+import java.io.IOException;
 
 public class LoginPage {
-    private Stage primaryStage;
+    private final Stage primaryStage;
     private Scene scene;
 
     public LoginPage(Stage primaryStage) {
@@ -24,87 +31,96 @@ public class LoginPage {
     }
 
     private void createUI() {
-        Image image1 = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/Spotify_logo.png");
+        Screen primaryScreen = Screen.getPrimary();
+        double screenWidth = primaryScreen.getBounds().getWidth();
+        double screenHeight = primaryScreen.getBounds().getHeight();
+        Image spotifyLogo = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/Spotify_logo.png");
+        Image backgroundImage = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/login-bg.png"); // Replace with the correct path
 
-        // Create an ImageView to display the image
-        ImageView imageView = new ImageView(image1);
-        imageView.setFitWidth(320);
-        imageView.setFitHeight(100);
-        imageView.setTranslateY(-150);
+        Font font = Font.font("Gotham Rounded", 16);
 
-        // Create textfields
-        TextField username = new TextField();
-        username.setPromptText("Username");
-        username.setPrefWidth(500);
-        username.setPrefHeight(40);
-        username.setStyle("-fx-background-color: RGB(51, 51, 51); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 16;");
+        // Spotify logo
+        ImageView spotifylogo = new ImageView(spotifyLogo);
+        spotifylogo.setFitWidth(320);
+        spotifylogo.setFitHeight(100);
+        spotifylogo.setTranslateY(-150);
 
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-        passwordField.setPrefWidth(500);
-        passwordField.setPrefHeight(40);
-        passwordField.setStyle("-fx-background-color: RGB(51, 51, 51); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 16;");
+        // black background rectangle
+        Rectangle rectangle = new Rectangle(400, 425);
+        rectangle.setArcWidth(20); // Adjust the arc width as needed
+        rectangle.setArcHeight(20); // Adjust the arc height as needed
+        rectangle.setFill(Color.rgb(0, 0, 0));
+        rectangle.setTranslateY(-50);
 
-        GridPane root1 = new GridPane();
-        root1.addRow(0, username);
-        root1.addRow(1, passwordField);
 
-        root1.setAlignment(Pos.CENTER);
+        // Set the background image
+        BackgroundImage backgroundImg = new BackgroundImage(
+                backgroundImage,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.DEFAULT,
+                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
+        );
 
-        // Set vertical gap (space) between rows in the GridPane
-        root1.setVgap(30); // Adjust the gap as needed
+        Background background = new Background(backgroundImg);
 
-        Rectangle rectangle = new Rectangle(700, 700); // Adjust the size as needed
-        rectangle.setStyle("-fx-background-color: RGB(51, 51, 51);"); // Set the color of the rectangle
-
-        // Create a StackPane
-        StackPane root = new StackPane();
-
-        // Initialize the scene
-        scene = new Scene(root, 1200, 1250);
-
-        // Set the background color of the scene to black
-        scene.getRoot().setStyle("-fx-background-color: RGB(20, 20, 20);");
-
-        // Create a Button for login
+        // login button
         Button loginButton = new Button();
-        Image image2 = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/login-btn.png");
+        Image image2 = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/spotify-1/src/main/java/com/example/spotify1/login-btn.png");
         ImageView imageView2 = new ImageView(image2);
-        imageView2.setFitWidth(320);
+        imageView2.setFitWidth(200);
         imageView2.setFitHeight(50);
+        imageView2.setTranslateY(0);
         loginButton.setStyle("-fx-background-color: RGB(0, 0, 0);");
-        loginButton.setTranslateY(150);
+        loginButton.setTranslateY(-10);
         loginButton.setGraphic(imageView2);
+
+        Text note = new Text("Verified by Spotify Oauth2.0");
+        note.setFill(Color.WHITE);
+        note.setFont(font);
+        note.setTranslateY(45);
+
+        StackPane root1 = new StackPane();
+        // Set the background for root1
+        root1.setBackground(background);
+
+        scene = new Scene(root1, 1200, 1250);
+        root1.getChildren().addAll(rectangle, spotifylogo, loginButton, note);
 
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                StackPane redirectedLayout = new StackPane();
-                Scene redirectedScene = new Scene(redirectedLayout, 1200, 1250);
-                primaryStage.setTitle("Spotify");
-                redirectedScene.getRoot().setStyle("-fx-background-color: RGB(30, 30, 30);");
 
-                primaryStage.setScene(redirectedScene);
+                Dashboard dashboard = new Dashboard(primaryStage);
+                primaryStage.setTitle("Spotify - Dashboard");
+                primaryStage.setScene(dashboard.getScene());
+                primaryStage.show();
+
+                /*
+                try {
+                    // Execute the Spotify authorization Python script
+                    ProcessBuilder processBuilder = new ProcessBuilder("python3", "src/python-scripts/main.py");
+                    Process process = processBuilder.start();
+                    int exitCode = process.waitFor();
+
+                    // Check if the Python script was executed successfully
+                    if (exitCode == 0) {
+                        Dashboard dashboard = new Dashboard(primaryStage);
+                        primaryStage.setTitle("Spotify - Dashboard");
+                        primaryStage.setScene(dashboard.getScene());
+                        primaryStage.show();
+                    } else {
+                        // Handle any error or failure
+                        System.out.println("Spotify authorization script failed.");
+                    }
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            */
             }
+
         });
 
-        //SIGNUP
-        Button signup = new Button("New to Spotify? Sign up here.");
-        signup.setStyle("-fx-background-color: RGB(0, 0, 0);-fx-text-fill: white;-fx-font-size: 16px; -fx-font-family: 'Gotham Rounded';-fx-underline: true;");
-        signup.setTranslateY(210);
-
-        root.getChildren().addAll(rectangle, imageView, root1, loginButton, signup);
-
-        signup.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                // Create an instance of SignupPage
-                SignupPage signupPage = new SignupPage(primaryStage);
-
-                // Set the scene to the signup page
-                primaryStage.setScene(signupPage.getScene());
-            }
-        });
     }
 
     public Scene getScene() {
