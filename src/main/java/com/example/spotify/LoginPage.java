@@ -1,5 +1,6 @@
 package com.example.spotify;
 
+import com.google.gson.stream.JsonToken;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -121,6 +122,8 @@ public class LoginPage {
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
+
+                AllTimeTopTracks();
                 RecentlyPlayedTracks();
 
             }
@@ -129,8 +132,8 @@ public class LoginPage {
 
     }
 
-    private void RecentlyPlayedTracks() {
-        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/python-scripts/recently_played.json"; // Replace with the actual path to your JSON file
+    private void AllTimeTopTracks() {
+        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/all_time_top_tracks.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
         String jsonData = readFile(jsonFilePath);
@@ -144,6 +147,81 @@ public class LoginPage {
         String dbPassword = "appleball9";
 
         try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Delete the previous data without deleting the table
+            String deleteSql = "DELETE FROM recently_played_tracks"; // Replace with your table name
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+                deleteStatement.executeUpdate();
+            }
+
+            // Reset the auto-increment counter to 1
+            String resetAutoIncrementSql = "ALTER TABLE recently_played_tracks AUTO_INCREMENT = 1"; // Replace with your table name
+            try (PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(resetAutoIncrementSql)) {
+                resetAutoIncrementStatement.executeUpdate();
+            }
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject track = jsonArray.get(i).getAsJsonObject();
+
+                // Check if 'track' is null
+                if (track != null) {
+                    // Extract track information as needed
+                    String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
+                    String trackName = track.get("name").getAsString();
+                    int duration = track.get("duration_ms").getAsInt();
+                    String albumCover = track.getAsJsonObject("album")
+                            .getAsJsonArray("images")
+                            .get(0).getAsJsonObject()
+                            .get("url").getAsString();
+                    String artistCover = track.getAsJsonArray("artists")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("external_urls")
+                            .get("spotify").getAsString();
+                    String releaseData = track.getAsJsonObject("album")
+                            .get("release_date").getAsString();
+
+                    // Insert data into the database
+                    insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "users_top_tracks");
+                } else {
+                    // Handle the case when 'track' is null
+                    System.err.println("Skipping entry at index " + i + " because 'track' is null.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    private void RecentlyPlayedTracks() {
+        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/recently_played.json"; // Replace with the actual path to your JSON file
+
+        // Read JSON data from the file
+        String jsonData = readFile(jsonFilePath);
+
+        // Parse the JSON data as an array
+        JsonArray jsonArray = JsonParser.parseString(jsonData).getAsJsonArray();
+
+        // Database URL, username, and password
+        String dbUrl = "jdbc:mysql://localhost:3306/spotify_data"; // Update with your database name
+        String dbUsername = "root";
+        String dbPassword = "appleball9";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Delete the previous data without deleting the table
+            String deleteSql = "DELETE FROM recently_played_tracks"; // Replace with your table name
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+                deleteStatement.executeUpdate();
+            }
+
+            // Reset the auto-increment counter to 1
+            String resetAutoIncrementSql = "ALTER TABLE recently_played_tracks AUTO_INCREMENT = 1"; // Replace with your table name
+            try (PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(resetAutoIncrementSql)) {
+                resetAutoIncrementStatement.executeUpdate();
+            }
+
+            System.out.println("\n\n");
             for (int i = 0; i < jsonArray.size(); i++) {
                 JsonObject trackObject = jsonArray.get(i).getAsJsonObject();
                 JsonObject track = trackObject.getAsJsonObject("track");
@@ -164,16 +242,12 @@ public class LoginPage {
                         .get("release_date").getAsString();
 
                 // Insert data into the database
-                insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData);
+                insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "recently_played_tracks");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
-
-
-
 
 
     private String readFile(String filePath) {
@@ -189,8 +263,8 @@ public class LoginPage {
         return content.toString();
     }
     private static void insertTrack(Connection connection, String artistName, String trackName, int duration,
-                                    String albumCover, String artistCover, String releaseData) throws SQLException {
-        String insertSQL = "INSERT INTO recently_played_tracks (artist_name, track_name, duration, album_cover, artist_cover, release_data) " +
+                                    String albumCover, String artistCover, String releaseData, String tableName) throws SQLException {
+        String insertSQL = "INSERT INTO " + tableName + " (artist_name, track_name, duration, album_cover, artist_cover, release_data) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
