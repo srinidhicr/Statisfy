@@ -20,6 +20,28 @@ while results['next']:
 with open('all_time_top_tracks.json', 'w', encoding='utf-8') as json_file:
     json.dump(top_tracks, json_file, ensure_ascii=False, indent=4)
 
+# TOP TRACKS OF AN USER FOR 4 WEEKS
+top_tracks = []
+results = sp.current_user_top_tracks(time_range='short_term', limit=50)
+top_tracks.extend(results['items'])
+while results['next']:
+    results = sp.next(results)
+    top_tracks.extend(results['items'])
+
+with open('4_weeks.json', 'w', encoding='utf-8') as json_file:
+    json.dump(top_tracks, json_file, ensure_ascii=False, indent=4)
+
+# TOP TRACKS OF AN USER FOR 6 MONTHS
+top_tracks = []
+results = sp.current_user_top_tracks(time_range='medium_term', limit=50)
+top_tracks.extend(results['items'])
+while results['next']:
+    results = sp.next(results)
+    top_tracks.extend(results['items'])
+
+with open('6_months.json', 'w', encoding='utf-8') as json_file:
+    json.dump(top_tracks, json_file, ensure_ascii=False, indent=4)
+
 # RECENTLY PLAYED TRACKS OF AN USER
 recently_played = []
 results = sp.current_user_recently_played()
@@ -31,8 +53,6 @@ while results['next']:
 with open('/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/recently_played.json', 'w', encoding='utf-8') as json_file:
     json.dump(recently_played, json_file, ensure_ascii=False, indent=4)
 
-print("Recently played tracks saved")
-print("All-time top tracks saved")
 
 """
 

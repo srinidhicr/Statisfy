@@ -1,6 +1,5 @@
 package com.example.spotify;
 
-import com.google.gson.stream.JsonToken;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -11,7 +10,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
@@ -67,7 +65,6 @@ public class LoginPage {
                 BackgroundPosition.DEFAULT,
                 new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, false, false, true, true)
         );
-
         Background background = new Background(backgroundImg);
 
         // login button
@@ -125,11 +122,129 @@ public class LoginPage {
 
                 AllTimeTopTracks();
                 RecentlyPlayedTracks();
-
+                TopTracks_4w();
+                TopTracks_6m();
             }
 
         });
+    }
 
+    private void TopTracks_4w() {
+        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/4_weeks.json"; // Replace with the actual path to your JSON file
+
+        // Read JSON data from the file
+        String jsonData = readFile(jsonFilePath);
+
+        // Parse the JSON data as an array
+        JsonArray jsonArray = JsonParser.parseString(jsonData).getAsJsonArray();
+
+        // Database URL, username, and password
+        String dbUrl = "jdbc:mysql://localhost:3306/spotify_data"; // Update with your database name
+        String dbUsername = "root";
+        String dbPassword = "appleball9";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Delete the previous data without deleting the table
+            String deleteSql = "DELETE FROM top_track_4w"; // Replace with your table name
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+                deleteStatement.executeUpdate();
+            }
+
+            // Reset the auto-increment counter to 1
+            String resetAutoIncrementSql = "ALTER TABLE top_track_4w AUTO_INCREMENT = 1"; // Replace with your table name
+            try (PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(resetAutoIncrementSql)) {
+                resetAutoIncrementStatement.executeUpdate();
+            }
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject track = jsonArray.get(i).getAsJsonObject();
+
+                // Check if 'track' is null
+                if (track != null) {
+                    // Extract track information as needed
+                    String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
+                    String trackName = track.get("name").getAsString();
+                    int duration = track.get("duration_ms").getAsInt();
+                    String albumCover = track.getAsJsonObject("album")
+                            .getAsJsonArray("images")
+                            .get(0).getAsJsonObject()
+                            .get("url").getAsString();
+                    String artistCover = track.getAsJsonArray("artists")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("external_urls")
+                            .get("spotify").getAsString();
+                    String releaseData = track.getAsJsonObject("album")
+                            .get("release_date").getAsString();
+
+                    // Insert data into the database
+                    insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "top_track_4w");
+                } else {
+                    // Handle the case when 'track' is null
+                    System.err.println("Skipping entry at index " + i + " because 'track' is null.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void TopTracks_6m() {
+        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/6_months.json"; // Replace with the actual path to your JSON file
+
+        // Read JSON data from the file
+        String jsonData = readFile(jsonFilePath);
+
+        // Parse the JSON data as an array
+        JsonArray jsonArray = JsonParser.parseString(jsonData).getAsJsonArray();
+
+        // Database URL, username, and password
+        String dbUrl = "jdbc:mysql://localhost:3306/spotify_data"; // Update with your database name
+        String dbUsername = "root";
+        String dbPassword = "appleball9";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Delete the previous data without deleting the table
+            String deleteSql = "DELETE FROM top_track_6m"; // Replace with your table name
+            try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+                deleteStatement.executeUpdate();
+            }
+
+            // Reset the auto-increment counter to 1
+            String resetAutoIncrementSql = "ALTER TABLE top_track_6m AUTO_INCREMENT = 1"; // Replace with your table name
+            try (PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(resetAutoIncrementSql)) {
+                resetAutoIncrementStatement.executeUpdate();
+            }
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JsonObject track = jsonArray.get(i).getAsJsonObject();
+
+                // Check if 'track' is null
+                if (track != null) {
+                    // Extract track information as needed
+                    String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
+                    String trackName = track.get("name").getAsString();
+                    int duration = track.get("duration_ms").getAsInt();
+                    String albumCover = track.getAsJsonObject("album")
+                            .getAsJsonArray("images")
+                            .get(0).getAsJsonObject()
+                            .get("url").getAsString();
+                    String artistCover = track.getAsJsonArray("artists")
+                            .get(0).getAsJsonObject()
+                            .getAsJsonObject("external_urls")
+                            .get("spotify").getAsString();
+                    String releaseData = track.getAsJsonObject("album")
+                            .get("release_date").getAsString();
+
+                    // Insert data into the database
+                    insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "top_track_6m");
+                } else {
+                    // Handle the case when 'track' is null
+                    System.err.println("Skipping entry at index " + i + " because 'track' is null.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void AllTimeTopTracks() {
@@ -189,8 +304,6 @@ public class LoginPage {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
     }
 
 
