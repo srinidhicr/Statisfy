@@ -26,9 +26,7 @@ public class Dashboard {
 
     private void createUI() {
         Font font = Font.font("Gotham Rounded", 40);
-        BorderPane borderPane = new BorderPane();
         HBox topBar = createTopBar();
-        borderPane.setTop(topBar);
 
         // Create the scene and set it to the stage
         StackPane root = new StackPane();
@@ -75,21 +73,89 @@ public class Dashboard {
         Button albums = createButton2("Albums");
         Button genres = createButton2("Genres");
 
+        artists.setOnAction(e -> {
+            Artists artist = new Artists(primaryStage);
+            primaryStage.setTitle("Spotify - Artists Analysis");
+            primaryStage.setScene(artist.getScene());
+            primaryStage.show();
+        });
+
+        tracks.setOnAction(e -> {
+            Tracks track = new Tracks(primaryStage);
+            primaryStage.setTitle("Spotify - Tracks Analysis");
+            primaryStage.setScene(track.getScene());
+            primaryStage.show();
+        });
+
+        albums.setOnAction(e -> {
+            Albums album = new Albums(primaryStage);
+            primaryStage.setTitle("Spotify - Album Analysis");
+            primaryStage.setScene(album.getScene());
+            primaryStage.show();
+        });
+
+        albums.setOnAction(e -> {
+            Genres genre = new Genres(primaryStage);
+            primaryStage.setTitle("Spotify - Genre Analysis");
+            primaryStage.setScene(genre.getScene());
+            primaryStage.show();
+        });
+
         // Add buttons to the GridPane at specific row and column positions
         buttonGrid.add(artists, 0, 0);
         buttonGrid.add(tracks, 1, 0);
         buttonGrid.add(albums, 0, 1);
         buttonGrid.add(genres, 1, 1);
 
-        content.getChildren().addAll(splogoImageView, note, buttonGrid);
+        content.getChildren().addAll(splogoImageView, note, buttonGrid, topBar);
 
         scene = new Scene(root, 1200, 1250);
 
         // Add content first, then borderPane
-        root.getChildren().addAll(content, borderPane);
+        root.getChildren().addAll(content);
         primaryStage.show();
     }
 
+    private HBox createTopBar() {
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(10, 20, 10, 20)); // Adjust the padding as needed
+        Button home = createButton("Home");
+        Button search = createButton("Search");
+
+        home.setOnAction(e -> {
+                Dashboard dashboard = new Dashboard(primaryStage);
+                primaryStage.setTitle("Spotify - Dashboard");
+                primaryStage.setScene(dashboard.getScene());
+                primaryStage.show();
+        });
+
+        // Create a spacer to push the "Account" button to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Create a MenuButton for the "Account" dropdown
+        MenuButton accountMenu = new MenuButton("Account");
+        accountMenu.setStyle("-fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-background-color: RGB(30, 223, 99); -fx-font-size: 18px; ");
+        accountMenu.setPrefWidth(200);
+        accountMenu.setPrefHeight(40);
+
+        // Create a MenuItem for the "Log Out" option
+        MenuItem logoutItem = new MenuItem("Log Out");
+        logoutItem.setOnAction(e -> {
+            // Handle the log out action here
+            System.out.println("Logged out");
+        });
+
+        // Add the Menu to the MenuButton
+        accountMenu.getItems().add(logoutItem);
+
+        topBar.getChildren().addAll(home, search, spacer, accountMenu);
+
+        topBar.setTranslateY(-770);
+        topBar.setSpacing(15);
+        topBar.setStyle("-fx-background-color: RGB(51, 51, 51);"); // Set background color for the top bar
+        return topBar;
+    }
 
 
     private Button createButton(String text) {
@@ -126,40 +192,6 @@ public class Dashboard {
         button.setStyle("-fx-background-color:  RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
         button.setOnAction(e -> System.out.println(text + " clicked"));
         return button;
-    }
-
-    private HBox createTopBar() {
-        HBox topBar = new HBox();
-        topBar.setPadding(new Insets(10, 20, 10, 20)); // Adjust the padding as needed
-        Button home = createButton("Home");
-        Button search = createButton("Search");
-
-        // Create a spacer to push the "Account" button to the right
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        // Create a MenuButton for the "Account" dropdown
-        MenuButton accountMenu = new MenuButton("Account");
-        accountMenu.setStyle("-fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-background-color: RGB(30, 223, 99); -fx-font-size: 18px; ");
-        accountMenu.setPrefWidth(200);
-        accountMenu.setPrefHeight(40);
-
-        // Create a MenuItem for the "Log Out" option
-        MenuItem logoutItem = new MenuItem("Log Out");
-        logoutItem.setOnAction(e -> {
-            // Handle the log out action here
-            System.out.println("Logged out");
-        });
-
-        // Add the Menu to the MenuButton
-        accountMenu.getItems().add(logoutItem);
-
-        topBar.getChildren().addAll(home, search, spacer, accountMenu);
-
-        topBar.setSpacing(15);
-        topBar.setStyle("-fx-background-color: RGB(51, 51, 51);"); // Set background color for the top bar
-
-        return topBar;
     }
 
     public Scene getScene() {
