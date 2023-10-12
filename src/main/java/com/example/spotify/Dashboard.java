@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
@@ -107,7 +106,7 @@ public class Dashboard {
         });
 
         button.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
-        button.setOnAction(e -> System.out.println(text + " clicked"));
+
         return button;
     }
 
