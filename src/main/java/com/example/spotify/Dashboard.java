@@ -33,7 +33,7 @@ public class Dashboard {
         // Create the scene and set it to the stage
         StackPane root = new StackPane();
         // Load your background image
-        Image backgroundImage = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/dashboard-bg.jpg"); // Replace with the correct path
+        Image backgroundImage = new Image("file:./images/dashboard-bg.jpg"); // Replace with the correct path
 
         // Set the background image
         BackgroundImage backgroundImg = new BackgroundImage(
@@ -47,7 +47,7 @@ public class Dashboard {
         Background background = new Background(backgroundImg);
         root.setBackground(background);
 
-        Image splogo= new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/splogo2.png");
+        Image splogo= new Image("file:./images/splogo2.png");
         ImageView splogoImageView = new ImageView(splogo);
         splogoImageView.setFitWidth(150); // Adjust the size as needed
         splogoImageView.setFitHeight(150); // Adjust the size as needed

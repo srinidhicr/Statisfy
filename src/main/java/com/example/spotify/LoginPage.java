@@ -38,8 +38,8 @@ public class LoginPage {
     }
 
     private void createUI() {
-        Image spotifyLogo = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/Spotify_logo.png");
-        Image backgroundImage = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/src/main/java/com/example/spotify/login-bg.png"); // Replace with the correct path
+        Image spotifyLogo = new Image("file:./images/Spotify_logo.png/");
+        Image backgroundImage = new Image("file:./images/login-bg.png"); // Replace with the correct path
 
         Font font = Font.font("Gotham Rounded", 16);
 
@@ -69,9 +69,9 @@ public class LoginPage {
 
         // login button
         Button loginButton = new Button();
-        Image image2 = new Image("file:/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/spotify-1/src/main/java/com/example/spotify1/login-btn.png");
+        Image image2 = new Image("file:./images/login-btn.png");
         ImageView imageView2 = new ImageView(image2);
-        imageView2.setFitWidth(200);
+        imageView2.setFitWidth(350);
         imageView2.setFitHeight(50);
         imageView2.setTranslateY(0);
         loginButton.setStyle("-fx-background-color: RGB(0, 0, 0);");
@@ -130,7 +130,7 @@ public class LoginPage {
     }
 
     private void TopTracks_4w() {
-        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/4_weeks.json"; // Replace with the actual path to your JSON file
+        String jsonFilePath = "4_weeks.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
         String jsonData = readFile(jsonFilePath);
@@ -189,7 +189,7 @@ public class LoginPage {
     }
 
     private void TopTracks_6m() {
-        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/6_months.json"; // Replace with the actual path to your JSON file
+        String jsonFilePath = "6_months.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
         String jsonData = readFile(jsonFilePath);
@@ -248,7 +248,7 @@ public class LoginPage {
     }
 
     private void AllTimeTopTracks() {
-        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/all_time_top_tracks.json"; // Replace with the actual path to your JSON file
+        String jsonFilePath = "all_time_top_tracks.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
         String jsonData = readFile(jsonFilePath);
@@ -308,7 +308,7 @@ public class LoginPage {
 
 
     private void RecentlyPlayedTracks() {
-        String jsonFilePath = "/Users/srinidhicr/Documents/Mine/vscode/sem5-packages/Spotify/recently_played.json"; // Replace with the actual path to your JSON file
+        String jsonFilePath = "recently_played.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
         String jsonData = readFile(jsonFilePath);
