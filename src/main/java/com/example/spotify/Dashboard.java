@@ -31,7 +31,7 @@ public class Dashboard {
         // Create the scene and set it to the stage
         StackPane root = new StackPane();
         // Load your background image
-        Image backgroundImage = new Image("file:./images/dashboard-bg.jpg"); // Replace with the correct path
+        Image backgroundImage = new Image("file:./images/dashboard-bg.jpg");
 
         // Set the background image
         BackgroundImage backgroundImg = new BackgroundImage(
@@ -94,7 +94,7 @@ public class Dashboard {
             primaryStage.show();
         });
 
-        albums.setOnAction(e -> {
+        genres.setOnAction(e -> {
             Genres genre = new Genres(primaryStage);
             primaryStage.setTitle("Spotify - Genre Analysis");
             primaryStage.setScene(genre.getScene());
@@ -127,6 +127,13 @@ public class Dashboard {
                 primaryStage.setTitle("Spotify - Dashboard");
                 primaryStage.setScene(dashboard.getScene());
                 primaryStage.show();
+        });
+
+        search.setOnAction(e -> {
+            Search search1 = new Search(primaryStage);
+            primaryStage.setTitle("Spotify - Search");
+            primaryStage.setScene(search1.getScene());
+            primaryStage.show();
         });
 
         // Create a spacer to push the "Account" button to the right

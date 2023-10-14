@@ -1,7 +1,17 @@
 package com.example.spotify;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Tracks {
@@ -14,12 +24,92 @@ public class Tracks {
     }
 
     private void createUI() {
+        HBox topBar = createTopBar();
+        Font font = Font.font("Gotham Rounded", 40);
+
         StackPane root = new StackPane();
-        Scene scene = new Scene(root, 1200, 1250);
+        scene = new Scene(root, 1200, 1250); // Assign the scene to the instance variable
+
+        VBox content = new VBox();
+        content.getChildren().addAll(topBar);
+        content.setAlignment(Pos.TOP_RIGHT);
+
+        Image splogo = new Image("file:./images/splogo2.png");
+        ImageView splogoImageView = new ImageView(splogo);
+        splogoImageView.setFitWidth(150);
+        splogoImageView.setFitHeight(150);
+        splogoImageView.setTranslateY(-350);
+
+        Text note = new Text("TRACKS");
+        note.setFill(Color.WHITE);
+        note.setFont(font);
+        note.setTranslateY(-250);
 
         // Set the background color of the scene to black
         scene.getRoot().setStyle("-fx-background-color: black;");
+        root.getChildren().addAll(content, note, splogoImageView);
+        primaryStage.setScene(scene); // Set the scene for primaryStage
         primaryStage.show();
+
+    }
+
+    private HBox createTopBar() {
+        HBox topBar = new HBox();
+        topBar.setPadding(new Insets(10, 20, 10, 20)); // Adjust the padding as needed
+        Button home = createButton("Home");
+        Button search = createButton("Search");
+
+        home.setOnAction(e -> {
+            Dashboard dashboard = new Dashboard(primaryStage);
+            primaryStage.setTitle("Spotify - Dashboard");
+            primaryStage.setScene(dashboard.getScene());
+            primaryStage.show();
+        });
+
+        // Create a spacer to push the "Account" button to the right
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Create a MenuButton for the "Account" dropdown
+        MenuButton accountMenu = new MenuButton("Account");
+        accountMenu.setStyle("-fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-background-color: RGB(30, 223, 99); -fx-font-size: 18px; ");
+        accountMenu.setPrefWidth(200);
+        accountMenu.setPrefHeight(40);
+
+        // Create a MenuItem for the "Log Out" option
+        MenuItem logoutItem = new MenuItem("Log Out");
+        logoutItem.setOnAction(e -> {
+            // Handle the log out action here
+            System.out.println("Logged out");
+        });
+
+        // Add the Menu to the MenuButton
+        accountMenu.getItems().add(logoutItem);
+
+        topBar.getChildren().addAll(home, search, spacer, accountMenu);
+
+        //topBar.setTranslateY(-770);
+        topBar.setSpacing(15);
+        topBar.setStyle("-fx-background-color: RGB(51, 51, 51);"); // Set background color for the top bar
+        return topBar;
+    }
+
+    private Button createButton(String text) {
+        Button button = new Button(text);
+
+        button.setPrefWidth(200);
+        button.setPrefHeight(40);
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color: gray; -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+
+        return button;
     }
     public Scene getScene() {
         return scene;

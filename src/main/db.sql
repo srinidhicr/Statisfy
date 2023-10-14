@@ -47,3 +47,13 @@ CREATE TABLE IF NOT EXISTS top_track_4w (
       artist_cover VARCHAR(255),
       release_data VARCHAR(10)
   );
+
+CREATE TABLE IF NOT EXISTS liked_tracks (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       artist_name VARCHAR(255),
+       track_name VARCHAR(255),
+       duration INT,
+       album_cover VARCHAR(255),
+       artist_cover VARCHAR(255),
+       release_data VARCHAR(10)
+   );

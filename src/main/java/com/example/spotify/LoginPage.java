@@ -93,13 +93,13 @@ public class LoginPage {
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                /*
+
                 Dashboard dashboard = new Dashboard(primaryStage);
                 primaryStage.setTitle("Spotify - Dashboard");
                 primaryStage.setScene(dashboard.getScene());
                 primaryStage.show();
-                */
 
+                /*
                 try {
                     // Execute the Spotify authorization Python script
                     ProcessBuilder processBuilder = new ProcessBuilder("python3", "src/python-scripts/main.py");
@@ -124,6 +124,8 @@ public class LoginPage {
                 RecentlyPlayedTracks();
                 TopTracks_4w();
                 TopTracks_6m();
+                */
+
             }
 
         });
