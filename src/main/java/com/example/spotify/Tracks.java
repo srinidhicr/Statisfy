@@ -1,11 +1,11 @@
 package com.example.spotify;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -13,10 +13,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.collections.ObservableList;
+import javafx.scene.control.cell.PropertyValueFactory;
+import java.sql.*;
+
 
 public class Tracks {
     private Stage primaryStage;
     private Scene scene;
+    private ObservableList<TrackData> data = FXCollections.observableArrayList();
+
+    private VBox content;
+
+    private TableView<TrackData> tableView;
 
     public Tracks(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -30,7 +39,7 @@ public class Tracks {
         StackPane root = new StackPane();
         scene = new Scene(root, 1200, 1250); // Assign the scene to the instance variable
 
-        VBox content = new VBox();
+        content = new VBox();
         content.getChildren().addAll(topBar);
         content.setAlignment(Pos.TOP_RIGHT);
 
@@ -67,11 +76,103 @@ public class Tracks {
         Button topt = createButton2("All time");
         Button recent = createButton2("Recently played");
 
+        top4w.setOnAction(e -> {
+            fetchAndDisplayTopTracks("top_track_4w");
+        });
+
+        top6m.setOnAction(e -> {
+            fetchAndDisplayTopTracks("top_track_6m");
+        });
+
+        top6m.setOnAction(e -> {
+            fetchAndDisplayTopTracks("users_top_tracks");
+        });
+
+
         // Add all buttons to the same row (HBox)
         topTracksButtons.getChildren().addAll(top4w, top6m, topt, recent);
 
         return topTracksButtons;
     }
+
+    // ...
+    private void fetchAndDisplayTopTracks(String tableName) {
+        String dbUrl = "jdbc:mysql://localhost:3306/spotify_data";
+        String dbUsername = "root";
+        String dbPassword = "appleball9";
+
+        try (Connection connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            String query = "SELECT * FROM " + tableName;
+
+            try (Statement statement = connection.createStatement()) {
+                try (ResultSet resultSet = statement.executeQuery(query)) {
+                    while (resultSet.next()) {
+                        String artistName = resultSet.getString("artist_name");
+                        String trackName = resultSet.getString("track_name");
+                        int duration = resultSet.getInt("duration");
+                        String albumCoverURL = resultSet.getString("album_cover"); // Use URL string
+                        String artistCoverURL = resultSet.getString("artist_cover"); // Use URL string
+                        String releaseDate = resultSet.getString("release_data");
+
+                        // Create a TrackData instance and add it to the data list
+                        TrackData track = new TrackData(artistName, trackName, duration, albumCoverURL, artistCoverURL, releaseDate);
+                        data.add(track);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create a TableView to display the fetched data
+        tableView = new TableView<>();
+        TableColumn<TrackData, String> artistNameCol = new TableColumn<>("Artist Name");
+        artistNameCol.setCellValueFactory(new PropertyValueFactory<>("artistName"));
+
+        TableColumn<TrackData, String> trackNameCol = new TableColumn<>("Track Name");
+        trackNameCol.setCellValueFactory(new PropertyValueFactory<>("trackName"));
+
+        TableColumn<TrackData, String> releaseDateCol = new TableColumn<>("Release Date");
+        releaseDateCol.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+
+        TableColumn<TrackData, Image> albumImageCol = new TableColumn<>("Album Image");
+        albumImageCol.setCellValueFactory(param -> {
+            // Here, we return the Image object from the albumURL
+            Image albumImage = new Image(param.getValue().getAlbumURL());
+            return new SimpleObjectProperty<>(albumImage);
+        });
+
+        albumImageCol.setCellFactory(column -> {
+            return new TableCell<TrackData, Image>() {
+                private final ImageView imageView = new ImageView();
+
+                @Override
+                protected void updateItem(Image item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setGraphic(null);
+                    } else {
+                        imageView.setImage(item);
+                        imageView.setFitWidth(50); // Set the desired width
+                        imageView.setFitHeight(50); // Set the desired height
+                        setGraphic(imageView);
+                    }
+                }
+            };
+        });
+
+        // Add more columns for other fields
+        tableView.getColumns().addAll(artistNameCol, trackNameCol, releaseDateCol, albumImageCol);
+        tableView.setItems(data);
+        content.getChildren().add(tableView);
+    }
+
+
+
+// ...
+
 
     private HBox createTopBar() {
         HBox topBar = new HBox();
