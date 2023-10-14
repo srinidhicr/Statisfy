@@ -40,10 +40,15 @@ public class Tracks {
         splogoImageView.setFitHeight(150);
         splogoImageView.setTranslateY(-350);
 
-        Text note = new Text("TRACKS");
+        Text note = new Text("TOP TRACKS");
         note.setFill(Color.WHITE);
         note.setFont(font);
         note.setTranslateY(-250);
+
+        HBox topTracksButtons = createTopTracksButtons();
+        topTracksButtons.setAlignment(Pos.CENTER);
+        topTracksButtons.setTranslateY(400);
+        content.getChildren().add(topTracksButtons);
 
         // Set the background color of the scene to black
         scene.getRoot().setStyle("-fx-background-color: black;");
@@ -51,6 +56,21 @@ public class Tracks {
         primaryStage.setScene(scene); // Set the scene for primaryStage
         primaryStage.show();
 
+    }
+
+    private HBox createTopTracksButtons() {
+        HBox topTracksButtons = new HBox();
+        topTracksButtons.setSpacing(20); // Adjust the spacing as needed
+
+        Button top4w = createButton2("4 weeks");
+        Button top6m = createButton2("6 months");
+        Button topt = createButton2("All time");
+        Button recent = createButton2("Recently played");
+
+        // Add all buttons to the same row (HBox)
+        topTracksButtons.getChildren().addAll(top4w, top6m, topt, recent);
+
+        return topTracksButtons;
     }
 
     private HBox createTopBar() {
@@ -118,6 +138,25 @@ public class Tracks {
 
         return button;
     }
+
+    private Button createButton2(String text) {
+        Button button = new Button(text);
+
+        button.setPrefWidth(200);
+        button.setPrefHeight(40);
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:  RGB(1,76,66); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color: RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setStyle("-fx-background-color:  RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        button.setOnAction(e -> System.out.println(text + " clicked"));
+        return button;
+    }
+
     public Scene getScene() {
         return scene;
     }

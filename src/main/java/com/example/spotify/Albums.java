@@ -45,6 +45,12 @@ public class Albums {
         note.setFont(font);
         note.setTranslateY(-250);
 
+        HBox topTracksButtons = createTopAlbumsButtons();
+        topTracksButtons.setAlignment(Pos.CENTER);
+        topTracksButtons.setTranslateY(400);
+        content.getChildren().add(topTracksButtons);
+
+
         // Set the background color of the scene to black
         scene.getRoot().setStyle("-fx-background-color: black;");
         root.getChildren().addAll(content, note, splogoImageView);
@@ -98,6 +104,39 @@ public class Albums {
         topBar.setSpacing(15);
         topBar.setStyle("-fx-background-color: RGB(51, 51, 51);"); // Set background color for the top bar
         return topBar;
+    }
+
+    private HBox createTopAlbumsButtons() {
+        HBox topTracksButtons = new HBox();
+        topTracksButtons.setSpacing(20); // Adjust the spacing as needed
+
+        Button top4w = createButton2("4 weeks");
+        Button top6m = createButton2("6 months");
+        Button topA = createButton2("All time");
+        Button recent = createButton2("Recently played");
+
+        // Add all buttons to the same row (HBox)
+        topTracksButtons.getChildren().addAll(top4w, top6m, topA, recent);
+
+        return topTracksButtons;
+    }
+
+    private Button createButton2(String text) {
+        Button button = new Button(text);
+
+        button.setPrefWidth(200);
+        button.setPrefHeight(40);
+        button.setOnMouseEntered(event -> {
+            button.setStyle("-fx-background-color:  RGB(1,76,66); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setOnMouseExited(event -> {
+            button.setStyle("-fx-background-color: RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        });
+
+        button.setStyle("-fx-background-color:  RGB(30, 223, 99); -fx-text-fill: white; -fx-font-family: 'Gotham Rounded'; -fx-font-size: 18px;");
+        button.setOnAction(e -> System.out.println(text + " clicked"));
+        return button;
     }
 
     private Button createButton(String text) {
