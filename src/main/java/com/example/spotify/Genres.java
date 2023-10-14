@@ -65,6 +65,13 @@ public class Genres {
             primaryStage.show();
         });
 
+        search.setOnAction(e -> {
+            Search search1 = new Search(primaryStage);
+            primaryStage.setTitle("Spotify - Search");
+            primaryStage.setScene(search1.getScene());
+            primaryStage.show();
+        });
+
         // Create a spacer to push the "Account" button to the right
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);

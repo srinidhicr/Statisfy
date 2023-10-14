@@ -49,7 +49,7 @@ public class Dashboard {
         ImageView splogoImageView = new ImageView(splogo);
         splogoImageView.setFitWidth(150); // Adjust the size as needed
         splogoImageView.setFitHeight(150); // Adjust the size as needed
-        splogoImageView.setTranslateY(-350);
+        splogoImageView.setTranslateY(-280);
 
         Text note = new Text("STATISFY");
         note.setFill(Color.WHITE);
