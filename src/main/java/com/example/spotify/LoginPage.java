@@ -20,13 +20,17 @@ import javafx.scene.text.Font;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.BufferedReader;
-import java.io.FileReader;
+
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class LoginPage {
     private final Stage primaryStage;
@@ -132,6 +136,10 @@ public class LoginPage {
     }
 
     private void TopTracks_4w() {
+        String albumCoverFolderPath = "./images/tracks/4w/albumcovers";
+        String artistCoverFolderPath = "./images/tracks/4w/artistcovers";
+        deleteImages(albumCoverFolderPath, artistCoverFolderPath);
+
         String jsonFilePath = "4_weeks.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
@@ -167,30 +175,103 @@ public class LoginPage {
                     String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
                     String trackName = track.get("name").getAsString();
                     int duration = track.get("duration_ms").getAsInt();
-                    String albumCover = track.getAsJsonObject("album")
+                    String albumCoverURL = track.getAsJsonObject("album")
                             .getAsJsonArray("images")
                             .get(0).getAsJsonObject()
                             .get("url").getAsString();
-                    String artistCover = track.getAsJsonArray("artists")
+                    String artistCoverURL = track.getAsJsonArray("artists")
                             .get(0).getAsJsonObject()
                             .getAsJsonObject("external_urls")
                             .get("spotify").getAsString();
                     String releaseData = track.getAsJsonObject("album")
                             .get("release_date").getAsString();
 
-                    // Insert data into the database
-                    insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "top_track_4w");
+                    // Generate unique filenames based on timestamp
+                    String timestamp = String.valueOf(System.currentTimeMillis());
+                    String albumCoverFileName = "album_cover_" + timestamp + ".jpg";
+                    String artistCoverFileName = "artist_cover_" + timestamp + ".jpg";
+
+                    // Download and save the images with unique filenames
+                    downloadAndSaveImage(albumCoverURL, albumCoverFolderPath + "/" + albumCoverFileName);
+                    downloadAndSaveImage(artistCoverURL, artistCoverFolderPath + "/" + artistCoverFileName);
+
+                    // Insert data into the database with the unique file paths
+                    insertTrack(connection, artistName, trackName, duration, albumCoverFolderPath + "/" + albumCoverFileName, artistCoverFolderPath + "/" + artistCoverFileName, releaseData, "top_track_4w");
                 } else {
                     // Handle the case when 'track' is null
                     System.err.println("Skipping entry at index " + i + " because 'track' is null.");
                 }
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    private void deleteImages(String albumCoverFolderPath, String artistCoverFolderPath){
+
+        File albumCoverFolder = new File(albumCoverFolderPath);
+        File[] albumCoverFiles = albumCoverFolder.listFiles();
+        if (albumCoverFiles != null) {
+            for (File file : albumCoverFiles) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+        }
+
+        // Delete all files in the artist cover folder
+        File artistCoverFolder = new File(artistCoverFolderPath);
+        File[] artistCoverFiles = artistCoverFolder.listFiles();
+        if (artistCoverFiles != null) {
+            for (File file : artistCoverFiles) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    private void downloadAndSaveImage(String imageUrl, String savePath) {
+        try {
+            URL url = new URL(imageUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            try (InputStream in = connection.getInputStream();
+                 FileOutputStream out = new FileOutputStream(savePath)) {
+                int bytesRead;
+                byte[] buffer = new byte[4096];
+                while ((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveImageLocally(String imageUrl, String folderPath) {
+        try {
+            URL url = new URL(imageUrl);
+            Path path = Path.of(folderPath, getFileNameFromUrl(imageUrl));
+            Files.copy(url.openStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getFileNameFromUrl(String url) {
+        String[] parts = url.split("/");
+        return parts[parts.length - 1];
+    }
+
     private void TopTracks_6m() {
+
+        String albumCoverFolderPath = "./images/tracks/6m/albumcovers";
+        String artistCoverFolderPath = "./images/tracks/6m/artistcovers";
+        deleteImages(albumCoverFolderPath, artistCoverFolderPath);
+
         String jsonFilePath = "6_months.json"; // Replace with the actual path to your JSON file
 
         // Read JSON data from the file
@@ -226,19 +307,28 @@ public class LoginPage {
                     String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
                     String trackName = track.get("name").getAsString();
                     int duration = track.get("duration_ms").getAsInt();
-                    String albumCover = track.getAsJsonObject("album")
+                    String albumCoverURL = track.getAsJsonObject("album")
                             .getAsJsonArray("images")
                             .get(0).getAsJsonObject()
                             .get("url").getAsString();
-                    String artistCover = track.getAsJsonArray("artists")
+                    String artistCoverURL = track.getAsJsonArray("artists")
                             .get(0).getAsJsonObject()
                             .getAsJsonObject("external_urls")
                             .get("spotify").getAsString();
                     String releaseData = track.getAsJsonObject("album")
                             .get("release_date").getAsString();
 
+                    // Generate unique filenames based on timestamp
+                    String timestamp = String.valueOf(System.currentTimeMillis());
+                    String albumCoverFileName = "album_cover_" + timestamp + ".jpg";
+                    String artistCoverFileName = "artist_cover_" + timestamp + ".jpg";
+
+                    // Download and save the images with unique filenames
+                    downloadAndSaveImage(albumCoverURL, albumCoverFolderPath + "/" + albumCoverFileName);
+                    downloadAndSaveImage(artistCoverURL, artistCoverFolderPath + "/" + artistCoverFileName);
+
                     // Insert data into the database
-                    insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "top_track_6m");
+                    insertTrack(connection, artistName, trackName, duration, albumCoverFolderPath + "/" + albumCoverFileName, artistCoverFolderPath + "/" + artistCoverFileName, releaseData, "top_track_6m");
                 } else {
                     // Handle the case when 'track' is null
                     System.err.println("Skipping entry at index " + i + " because 'track' is null.");
@@ -345,19 +435,20 @@ public class LoginPage {
                 String artistName = track.getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString();
                 String trackName = track.get("name").getAsString();
                 int duration = track.get("duration_ms").getAsInt();
-                String albumCover = track.getAsJsonObject("album")
+                String albumCoverURL = track.getAsJsonObject("album")
                         .getAsJsonArray("images")
                         .get(0).getAsJsonObject()
                         .get("url").getAsString();
-                String artistCover = track.getAsJsonArray("artists")
+                String artistCoverURL = track.getAsJsonArray("artists")
                         .get(0).getAsJsonObject()
                         .getAsJsonObject("external_urls")
                         .get("spotify").getAsString();
                 String releaseData = track.getAsJsonObject("album")
                         .get("release_date").getAsString();
 
+
                 // Insert data into the database
-                insertTrack(connection, artistName, trackName, duration, albumCover, artistCover, releaseData, "recently_played_tracks");
+                insertTrack(connection, artistName, trackName, duration, albumCoverURL, artistCoverURL, releaseData, "recently_played_tracks");
             }
         } catch (SQLException e) {
             e.printStackTrace();
